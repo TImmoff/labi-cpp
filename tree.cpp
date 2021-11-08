@@ -185,78 +185,14 @@ void Load_tree_from_input(Tree* root, int key, string keyfio) {
 }
 
 void View_Tree(Tree* p, int level) {
-    string str;
-    int right = 0;
-    if (p) {
-        View_Tree(p->right, level + 1); // Правое поддерево
-        for (int i = 0; i < level; i++) str = str + " ";
-        //Form1->Memo1->Lines->Add(str + IntToStr(p->info));
-        cout << str << p->info.number << '(' << p->info.name<< ')' << endl;
-        View_Tree(p->left, level + 1); // Левое поддерево
-    }
+	string str;
+	if (p) {
+		View_Tree(p->right, level + 1); // Правое поддерево
+		for (int i = 0; i < level; i++) str = str + " ";
+		//Form1->Memo1->Lines->Add(str + IntToStr(p->info));
+		View_Tree(p->left, level + 1); // Левое поддерево
+	}
 }
-void View_inReverse(Tree* p, int level = 0) {
-    string str;
-    if (p) {
-        View_inReverse(p->right, level + 1);
-        for (int i = 0; i < level; i++) str = str + " ";
-        cout << str << p->info.number << '(' << p->info.name << ')';
-        View_inReverse(p->left, level + 1);
-    }
-}
-void View_inDirect(Tree* p, int level = 0) {
-    string str;
-    if (p) {
-        View_inDirect(p->right, level + 1);
-        for (int i = 0; i < level; i++) str = str + " ";
-        View_inDirect(p->left, level + 1);
-        cout << str << p->info.number << '(' << p->info.name << ')';
-
-    }
-}
-void View_inRaise(Tree* p, int level = 0) {
-    string str;
-    if (p) {
-        View_inRaise(p->left, level + 1);
-        for (int i = 0; i < level; i++) str = str + " ";
-        cout << str << p->info.number << '(' << p->info.name << ')';
-
-        View_inRaise(p->right, level + 1);
-    }
-}
-
-int View_Tree_right(Tree* p, int level = 0) {
-    string str;
-    int count = 0;
-    if (p) {
-
-        count += View_Tree_right(p->right, level + 1);// Правое поддерево
-        for (int i = 0; i < level; i++) str = str + " ";
-
-        cout << str << p->info.name << endl;
-        if (level != 0)
-            count += View_Tree_right(p->left, level + 1); // Левое поддерево
-
-        count += 1;
-    }
-    return count;
-}
-int View_Tree_left(Tree* p, int level = 0) {
-    string str;
-    int count = 0;
-    if (p) {
-
-        count += View_Tree_left(p->left, level + 1); // Левое поддерево
-
-        if (level != 0)
-            count += View_Tree_left(p->right, level + 1);// Правое поддерево
-
-        count += 1;
-    }
-    return count;
-}
- 
-
 Tree* Del_Info(Tree* root, int key) {
 	Tree* Del, * Prev_Del, * R, * Prev_R;
 	// Del, Prev_Del – удаляемый узел и его предыдущий (предок); 
@@ -337,18 +273,153 @@ int main()
 					------ -
 						int b = StrToInt(Form1->Edit1->Text);
 					root = Del_Info(root, b);
-					//--------------------- Текст функции-обработчика кнопки ОЧИСТИТЬ -------
-					--------
-						Del_Tree(root);
-					ShowMessage(" Tree Delete!");
-					root = NULL;
-					//--------------------- Текст функции-обработчика кнопки EXIT -----------------
-					if (root != NULL) {
-						Del_Tree(root);
-						ShowMessage(" Tree Delete!");
-					}
+			void Make_Blns(Tree** p, int n, int k, User* a) {
+    if (n == k) {
+        *p = NULL;
+        return;
+    }
+    else {
+        int m = (n + k) / 2;
+        *p = new Tree;
+        (*p)->info = a[m];
+        Make_Blns(&(*p)->left, n, m, a);
+        Make_Blns(&(*p)->right, m + 1, k, a);
+    }
+}
 
-			}
-	
-	}
+Tree* Del_Info(Tree* root, int key) {
+    Tree* Del, * Prev_Del, * R, * Prev_R;
+    // Del, Prev_Del – удаляемый узел и его предыдущий (предок); 
+    // R, Prev_R – элемент, на который заменяется удаленный узел, и его пре док;
+    Del = root;
+    Prev_Del = NULL;
+    //-------- Поиск удаляемого элемента и его предка по ключу key ---------
+    while (Del != NULL && Del->info.number != key) {
+        Prev_Del = Del;
+        if (Del->info.number > key) Del = Del->left;
+        else Del = Del->right;
+    }
+    if (Del == NULL) { // Элемент не найден
+        cout << "NOT Key!";
+        return root;
+    }
+    //-------------------- Поиск элемента R для замены --------------------------------
+    if (Del->right == NULL) R = Del->left;
+    else
+        if (Del->left == NULL) R = Del->right;
+        else {
+            //---------------- Ищем самый правый узел в левом поддереве -----------------
+            Prev_R = Del;
+            R = Del->left;
+            while (R->right != NULL) {
+                Prev_R = R;
+                R = R->right;
+            }
+            //----------- Нашли элемент для замены R и его предка Prev_R -------------
+            if (Prev_R == Del) R->right = Del->right;
+            else {
+                R->right = Del->right;
+                Prev_R->right = R->left;
+                R->left = Prev_R;
+            }
+        }
+    if (Del == root) root = R; // Удаляя корень, заменяем его на R
+    else
+        //------- Поддерево R присоединяем к предку удаляемого узла -----------
+        if (Del->info.number < Prev_Del->info.number)
+            Prev_Del->left = R; // На левую ветвь
+        else Prev_Del->right = R; // На правую ветвь
+    delete Del;
+    return root;
+}
+void Del_Tree(Tree* t) {
+    if (t != NULL) {
+        Del_Tree(t->left); // На левую ветвь
+        Del_Tree(t->right); // На правую ветвь
+        delete t;
+    }
+}
+int main()
+{
+    Tree* root = NULL;
+    char choice = ' ';
+    int key;
+    string keyfio;
+    User array;
+    User* arr = new User[4];
+    setlocale(LC_ALL, "Russian");
+    /*cout << "Генерируем цифры добавляем в Stack:" << endl;
+    for (int i = 0; i < n; i++) {
+        int x = distribution(generator);
+        stackMain = push(stackMain, x);
+        cout << x;
+        if (i != n - 1) cout << ' ';
+    }*/
+    cout << endl;
+    while (choice != 'e') {
+        cout << "What you want to do?" << endl;
+        cout << "c-create, m-create array, a-add, b-balance, v-view, r-view rigth elemnts, o-viev in reverse order, p- in direct, g-in raise, l-view left elements k-delete key, d- delete,e-exit" << endl;
+        cin >> choice;
+        switch (choice) {
+        case 'c':
+            root = Create(root);
+            break;
+            
+        case'm':
+            Del_Tree(root);
+            root = Load_tree_from_arr(root, A, 8);
+
+            //Del_Tree(root);
+            //root = Load(root, B, 8);
+            // 
+            //Del_Tree(root);
+            //root = Load(root, Abalanced, 8);
+            break;
+            case'a':
+                cout << "Emter keyfio to add- ";
+                cin >> keyfio;
+                cout << "Enter key to add- ";
+                cin >> key;
+                Load_tree_from_input(root, key, keyfio);
+                cout << endl;
+                break;
+            break;
+        case'b':
+          
+            Make_Blns(&root, 0, 8, Abalanced);
+            break;
+
+        case'v':
+            View_Tree(root, 0);
+            cout << endl;
+            break;
+        case'k':
+            cout << "Enter key to delete";
+            cin >> key;
+            Del_Info(root, key);
+            break;
+        case'd':
+            Del_Tree(root);
+            break;
+        case'r':
+            cout << "count: " << View_Tree_right(root) - 1 << endl;
+        case'p':
+            View_inDirect(root);
+            cout << endl;
+            break;
+        case'o':
+            View_inReverse(root);
+            cout << endl;
+            break;
+        case'g':
+            View_inRaise(root);
+            cout << endl;
+            break;
+        case'l':
+            cout << "count: " << View_Tree_left(root) - 1 << endl;
+        case'e':
+            break;
+            
+        }
+    }
 }
