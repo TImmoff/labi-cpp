@@ -3,10 +3,49 @@
 
 #include <iostream>
 using namespace std;
+struct User {
+    int number;
+    string name;
+};
+
 struct Tree {
 	int info;
 	Tree* left, * right;
 } *root;
+struct User A[8] =
+{
+  { 10, "Sandra Adams"},
+  { 6, "Ali Connors" },
+  { 25, "Trevor Hansen" },
+  { 1, "Tucker Smith" },
+  { 8, "Britta Holt" },
+  { 20, "Boris Godunov" },
+  { 30, "Jane Smith" },
+  { 21, "Sandra Williams" },
+};
+struct User Abalanced[8] =
+{
+  { 1, "Tucker Smith" },
+  { 6, "Ali Connors" },
+  { 8, "Britta Holt" },
+  { 10, "Sandra Adams"},
+  { 20, "Boris Godunov" },
+  { 21, "Sandra Williams" },
+  { 25, "Trevor Hansen" },
+  { 30, "Jane Smith" },
+};
+struct User B[8] =
+{ 
+  { 7, "Sandra Adams"},
+  { 4, "Ali Connors" },
+  { 9, "Trevor Hansen" },
+  { 6, "Tucker Smith" },
+  { 2, "Britta Holt" },
+  { 8, "Boris Godunov" },
+  { 10, "Jane Smith" },
+  { 5, "Sandra Williams" },
+};
+
 Tree* List(int inf) {
 	Tree* t = new Tree; // Захват памяти
 	t->info = inf; // Формирование информационной части
