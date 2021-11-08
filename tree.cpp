@@ -116,16 +116,147 @@ Tree* Load_tree_from_arr(Tree* root, User* data, int length) {
     }
     return root;
 }
+Tree* Create(Tree* root) {
+    Tree* Prev = NULL, * t;
+    // Prev – родитель текущего элемента
+    int b, find;
+    string c;
+    if (!root) {   	       // Если дерево не создано
+        cout << "Input Root(name)-";
+        cin >> c;
+        cout << "Input Root(number) : ";
+        cin >> b;
+        root = List(c, b);   /* Создаем адрес корня root, который первоначально – лист*/
+    }
+    //---------- Добавление элементов -----------
+    while (1) {				//  while (true)
+        cout << "Input info(name) : ";
+        cin >> c;
+        cout << " Input info(number) :  ";
+        cin >> b;
+        if (b < 0) break;
+        // Признак выхода – отрицательное число
+        t = root;
+        // Текущий указатель установили на корень
+        find = 0;
+        // Признак поиска
+        while (t && !find) {
+            Prev = t;
+            if (b == t->info.number)
+                find = 1;
+            // Ключи должны быть уникальны
+            else
+                if (b < t->info.number) t = t->left;
+                else   t = t->right;
+        }
+        // Если нашли место с адресом Prev
+        if (!find) {			//  if (find == 0)	
+  // Создаем новый узел, являющийся листом
+            t = List(c, b);
+            // и присоединяем его, либо
+            if (b < Prev->info.number)
+                // на левую ветвь,
+                Prev->left = t;
+            // либо на правую ветвь
+            else    Prev->right = t;
+        }
+    }	 		// Конец цикла while ( 1 )
+    return root;
+}
+void Load_tree_from_input(Tree* root, int key, string keyfio) {
+    Tree* prev = NULL, * t; // prev – указатель предка нового листа
+    bool find = true;
+    t = root;
+    while (t && find) {
+        prev = t;
+        if (key == t->info.number && keyfio == t->info.name) {
+            find = false; // Ключ должен быть уникален
+            cout << "Dublucate Key!";
+        }
+        else
+            if (key < t->info.number) t = t->left;
+            else t = t->right;
+    }
+    if (find) { // Нашли нужное место
+        t = List(keyfio, key); // Создаем новый лист
+        if (key < prev->info.number) prev->left = t;
+        else prev->right = t;
+    }
+}
 
 void View_Tree(Tree* p, int level) {
-	string str;
-	if (p) {
-		View_Tree(p->right, level + 1); // Правое поддерево
-		for (int i = 0; i < level; i++) str = str + " ";
-		//Form1->Memo1->Lines->Add(str + IntToStr(p->info));
-		View_Tree(p->left, level + 1); // Левое поддерево
-	}
+    string str;
+    int right = 0;
+    if (p) {
+        View_Tree(p->right, level + 1); // Правое поддерево
+        for (int i = 0; i < level; i++) str = str + " ";
+        //Form1->Memo1->Lines->Add(str + IntToStr(p->info));
+        cout << str << p->info.number << '(' << p->info.name<< ')' << endl;
+        View_Tree(p->left, level + 1); // Левое поддерево
+    }
 }
+void View_inReverse(Tree* p, int level = 0) {
+    string str;
+    if (p) {
+        View_inReverse(p->right, level + 1);
+        for (int i = 0; i < level; i++) str = str + " ";
+        cout << str << p->info.number << '(' << p->info.name << ')';
+        View_inReverse(p->left, level + 1);
+    }
+}
+void View_inDirect(Tree* p, int level = 0) {
+    string str;
+    if (p) {
+        View_inDirect(p->right, level + 1);
+        for (int i = 0; i < level; i++) str = str + " ";
+        View_inDirect(p->left, level + 1);
+        cout << str << p->info.number << '(' << p->info.name << ')';
+
+    }
+}
+void View_inRaise(Tree* p, int level = 0) {
+    string str;
+    if (p) {
+        View_inRaise(p->left, level + 1);
+        for (int i = 0; i < level; i++) str = str + " ";
+        cout << str << p->info.number << '(' << p->info.name << ')';
+
+        View_inRaise(p->right, level + 1);
+    }
+}
+
+int View_Tree_right(Tree* p, int level = 0) {
+    string str;
+    int count = 0;
+    if (p) {
+
+        count += View_Tree_right(p->right, level + 1);// Правое поддерево
+        for (int i = 0; i < level; i++) str = str + " ";
+
+        cout << str << p->info.name << endl;
+        if (level != 0)
+            count += View_Tree_right(p->left, level + 1); // Левое поддерево
+
+        count += 1;
+    }
+    return count;
+}
+int View_Tree_left(Tree* p, int level = 0) {
+    string str;
+    int count = 0;
+    if (p) {
+
+        count += View_Tree_left(p->left, level + 1); // Левое поддерево
+
+        if (level != 0)
+            count += View_Tree_left(p->right, level + 1);// Правое поддерево
+
+        count += 1;
+    }
+    return count;
+}
+ 
+
 Tree* Del_Info(Tree* root, int key) {
 	Tree* Del, * Prev_Del, * R, * Prev_R;
 	// Del, Prev_Del – удаляемый узел и его предыдущий (предок); 
