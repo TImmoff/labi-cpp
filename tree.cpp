@@ -45,33 +45,78 @@ struct User B[8] =
   { 10, "Jane Smith" },
   { 5, "Sandra Williams" },
 };
+User creat()
+{
+    User mas;
+    cout << "enter letter-";
+    cin >> mas.name;
+    cout << "enter number";
+    cin >> mas.number;
+    return mas;
+}
 
-Tree* List(int inf) {
-	Tree* t = new Tree; // Захват памяти
-	t->info = inf; // Формирование информационной части
-	t->left = t->right = NULL; // Формирование адресных частей
-	return t; // Возврат созданного указателя
+Tree* List(string fi, int inf) {
+    Tree* t = new Tree; // Захват памяти
+    t->info.name = fi; // Формирование информационной части
+    t->info.number = inf;
+    t->left = t->right = NULL; // Формирование адресных частей
+    return t; // Возврат созданного указателя
 }
-void Add_List(Tree* root, int key) {
-	Tree* prev, * t; // prev – указатель предка нового листа
-	bool find = true;
-	t = root;
-	while (t && find) {
-		prev = t;
-		if (key == t->info) {
-			find = false; // Ключ должен быть уникален
-			cout<<"Dublucate Key!";
-		}
-		else
-			if (key < t->info) t = t->left;
-			else t = t->right;
-	}
-	if (find) { // Нашли нужное место
-		t = List(key); // Создаем новый лист
-		if (key < prev->info) prev->left = t;
-		else prev->right = t;
-	}
+void Add_from_arr(Tree* p, User a)
+{
+    if (p != NULL)
+    {
+        if (p->info.number > a.number)Add_from_arr(p->left, a);
+        else Add_from_arr(p->right, a);
+    }
+    else
+    {
+        p = new Tree;
+        p->left = p->right = NULL;
+        p->info = a;
+    }
 }
+
+Tree* Load_tree_from_arr(Tree* root, User* data, int length) {
+    Tree* Prev = NULL, * t;
+    // Prev – родитель текущего элемента
+    int  find=0;
+    string c;
+    if (length < 1) return root;
+    if (!root) {   	       // Если дерево не создано
+        root = List(data[0].name, data[0].number);   /* Создаем адрес корня root, который первоначально – лист*/
+    }
+    //---------- Добавление элементов -----------
+    for (int i = 1; i < length; i++)
+    {
+        t = root;
+        // Текущий указатель установили на корень
+        find = 0;
+        // Признак поиска
+        while (t && !find) {
+            Prev = t;
+            if (data[i].number == t->info.number)
+                find = 1;
+            // Ключи должны быть уникальны
+            else
+                if (data[i].number < t->info.number) t = t->left;
+                else   t = t->right;
+        }
+        // Если нашли место с адресом Prev
+        if (!find) {			//  if (find == 0)	
+  // Создаем новый узел, являющийся листом
+            t = List(data[i].name, data[i].number);
+            // и присоединяем его, либо
+            if (data[i].number < Prev->info.number)
+                // на левую ветвь,
+                Prev->left = t;
+            // либо на правую ветвь
+            else    Prev->right = t;
+        }
+    }
+    return root;
+}
+
 void View_Tree(Tree* p, int level) {
 	string str;
 	if (p) {
